@@ -1,49 +1,48 @@
-def num_word_idx_from_file(file_path):
-    patterns = {
-        "one": 1, "1": 1,
-        "two": 2, "2": 2,
-        "three": 3, "3": 3,
-        "four": 4, "4": 4,
-        "five": 5, "5": 5,
-        "six": 6, "6": 6,
-        "seven": 7, "7": 7,
-        "eight": 8, "8": 8,
-        "nine": 9, "9": 9,
-        # Add more patterns as needed
-    }
+import re
 
-    with open(file_path, 'r') as file:
-        total_sum = 0
+number_map = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9
+}
 
-        for line in file:
-            indices = []
+def extract_first_and_last_numbers(text):
+    pattern = r"\d+"
+    matches = re.findall(pattern, text)
+    if len(matches) == 1:
+        return ((matches[0]), (matches[0]))
+    elif len(matches) >= 2:
+        return (matches[0]), (matches[-1])
+    else:
+        return None
+  
 
-            for pat in patterns:
-                for idx in range(len(line)):
-                    if line.startswith(pat, idx):
-                        indices.append((idx, patterns[pat]))
+def calculate_sum(data):
+    sum = 0
+    for i in range(len(data)):
+        #comment out replace_words_with_numbers for part 1
+        replace_words_with_numbers(i, data)
+        data[i] = [extract_first_and_last_numbers(x) for x in data[i]]
+        flattened_data = [item for sublist in data for item in sublist]
+        number_to_add = flattened_data[i][0][0] + flattened_data[i][1][-1]
+        sum += int(number_to_add)
+    return sum
 
-            if indices:
-                if len(indices) == 1:
-                    (left_i, left_val), (right_i, right_val) = indices[0], indices[0]
-                else:
-                    (left_i, left_val), (right_i, right_val) = indices[0], (0, 0)
-            else:
-                (left_i, left_val), (right_i, right_val) = (0, 0), (0, 0)
 
-            for (idx, val) in indices[1:]:
-                left = (idx, val) if idx < left_i else (left_i, left_val)
-                right = (idx, val) if idx >= right_i else (right_i, right_val)
+def replace_words_with_numbers(i, data):
+    for key in number_map:
+        # replacement adds the key back either side of the number so that spelling is not broken on other number words.
+        replacement = key + str(number_map[key]) + key
+        data[i] = [x.replace(key, replacement) for x in data[i]]
 
-                left_i, left_val = left
-                right_i, right_val = right
+with open("test_input.txt") as f:
+    data = [x.strip().split(',') for x in f.read().splitlines()]
 
-            print(str(left_val) + str(right_val))
-            total_sum += left_val * 10 + right_val
 
-    return total_sum
-
-# Example usage:
-file_path = "test_input.txt"  # Replace with the actual path to your file
-result = num_word_idx_from_file(file_path)
-print(result)
+print(calculate_sum(data))
