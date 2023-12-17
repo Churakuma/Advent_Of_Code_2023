@@ -43,8 +43,8 @@ def replace_words_with_numbers(i, data):
             sublist.append(x.replace(key, replacement))
             data[i] = sublist
 
-with open("day1_input.txt") as f:
-    data = [x.strip().split(',') for x in f.read().splitlines()]
+with open("day1_input.txt") as file:
+    data = [x.strip().split(',') for x in file.read().splitlines()]
 
 
 print(calculate_sum(data))
